@@ -1,13 +1,14 @@
 import * as THREE from "three";
 import { Suspense, useRef, useState } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { useGLTF, Environment } from "@react-three/drei";
+import { useGLTF, Environment, OrbitControls } from "@react-three/drei";
 import { EffectComposer, DepthOfField } from "@react-three/postprocessing";
 import { Depth, Fresnel, LayerMaterial } from "lamina";
+import { useControls } from "leva";
 
 function Peach({ z }) {
   const ref = useRef();
-  const { nodes, materials } = useGLTF("/peach-transformed.glb");
+  const { nodes } = useGLTF("/peach-transformed.glb");
   const { viewport, camera } = useThree();
   const { width, height } = viewport.getCurrentViewport(camera, [0, 0, z]);
   const [data] = useState({
@@ -41,6 +42,32 @@ function Peach({ z }) {
 }
 
 function Sphere() {
+  const { transmission, roughness, thickness, ior } = useControls({
+    transmission: {
+      value: 1,
+      min: 0,
+      max: 1,
+      step: 0.1,
+    },
+    roughness: {
+      value: 0.2,
+      min: 0,
+      max: 5,
+      step: 0.1,
+    },
+    thickness: {
+      value: 2,
+      min: 0,
+      max: 10,
+      step: 0.1,
+    },
+    ior: {
+      value: 1.1,
+      min: 1,
+      max: 10,
+      step: 0.1,
+    },
+  });
   const ref = useRef();
   return (
     <mesh ref={ref}>
@@ -48,16 +75,16 @@ function Sphere() {
       <LayerMaterial
         color={"#efd4c0"}
         lighting={"physical"}
-        transmission={1}
-        roughness={0.67}
-        thickness={2}
-        ior={1.5}
+        transmission={transmission}
+        roughness={roughness}
+        thickness={thickness}
+        ior={ior}
         depthwrite={false}
       >
         <Depth
-          near={0.000003}
-          far={0.0000001}
-          origin={[-0.4920000000000004, 0.4250000000000003, 0]}
+          near={0.3}
+          far={0.1}
+          origin={[-0.492, 0.425, 0]}
           colorA={"#fec5da"}
           colorB={"#00b8fe"}
         />
@@ -85,7 +112,7 @@ export default function App({ count = 100, depth = 80 }) {
           <Peach key={i} z={-(i / count) * depth - 5} />
         ))}
         <Sphere position={[0, 0, 0]} />
-        <Environment preset="sunset" />
+        <Environment preset="dawn" />
         <EffectComposer>
           <DepthOfField
             target={[0, 0, 0]}
@@ -94,6 +121,7 @@ export default function App({ count = 100, depth = 80 }) {
             height={700}
           />
         </EffectComposer>
+        <OrbitControls />
       </Suspense>
     </Canvas>
   );
