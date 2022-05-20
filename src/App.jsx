@@ -35,20 +35,18 @@ function Peach({ z }) {
       ref={ref}
       scale={3}
       geometry={nodes.Peaach.geometry}
-      // material={materials.Skin}
-      material={materials.Skin}
+      material={nodes.Peaach.material}
     />
   );
 }
 
-function Plane() {
+function Sphere() {
   const ref = useRef();
   return (
     <mesh ref={ref}>
       <sphereGeometry args={[0.5, 32, 32]} />
-      {/* <planeGeometry args={[1, 1, 1]} /> */}
       <LayerMaterial
-        color={"#fffff"}
+        color={"#efd4c0"}
         lighting={"physical"}
         transmission={1}
         roughness={0.67}
@@ -64,11 +62,11 @@ function Plane() {
           colorB={"#00b8fe"}
         />
         <Fresnel
-          color={"#fefefe"}
-          bias={-0.3430000000000002}
-          intensity={3.8999999999999946}
-          power={3.3699999999999903}
-          factor={1.119999999999999}
+          color={"#efd4c0"}
+          bias={-0.34}
+          intensity={3.9}
+          power={3.37}
+          factor={2}
           mode={"screen"}
         />
       </LayerMaterial>
@@ -79,14 +77,14 @@ function Plane() {
 export default function App({ count = 100, depth = 80 }) {
   return (
     <Canvas gl={{ alpha: false }} camera={{ near: 0.01, far: 110, fov: 30 }}>
-      <color attach="background" args={["#efd4c0"]} />
+      <color attach="background" args={["#fffff"]} />
       <ambientLight intensity={1} />
       <spotLight position={[10, 10, 10]} intensity={2} />
       <Suspense fallback={null}>
         {Array.from({ length: count }, (_, i) => (
           <Peach key={i} z={-(i / count) * depth - 5} />
         ))}
-        <Plane position={[0, 0, 0]} />
+        <Sphere position={[0, 0, 0]} />
         <Environment preset="sunset" />
         <EffectComposer>
           <DepthOfField
